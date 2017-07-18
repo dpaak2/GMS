@@ -44,12 +44,12 @@ public class BoardController {
 				JOptionPane.showMessageDialog(null,ArticleServiceImpl.getInstance().findById(JOptionPane.showInputDialog("조회하실 아이디 입력")));
 				break;
 			case UPDATE:
-				article= new ArticleBean();
+				ArticleBean updateBean= new ArticleBean();
 				int articleSeq=Integer.parseInt(JOptionPane.showInputDialog("update seqno?"));
-				article.setArticleSeq(articleSeq);
-				article.setTitle(JOptionPane.showInputDialog("update title"));
-				article.setContent(JOptionPane.showInputDialog("update content"));
-				JOptionPane.showMessageDialog(null,ArticleServiceImpl.getInstance().updateArticle(article));
+				updateBean.setArticleSeq(articleSeq);
+				updateBean.setTitle(JOptionPane.showInputDialog("update title"));
+				updateBean.setContent(JOptionPane.showInputDialog("update content"));
+				JOptionPane.showMessageDialog(null,ArticleServiceImpl.getInstance().updateArticle(updateBean));
 				break;
 			case DEL:
 				int deleteSeq= Integer.parseInt(JOptionPane.showInputDialog("delete seq number?"));

@@ -30,14 +30,14 @@ public class MemberServiceImpl implements MemberService {
 		String result="";
 		
 			MemberDAO dao=new MemberDAOImpl();
-			result= (dao.insertMember(bean)!=1)?"회원가입이 실패하였습니다.":"회원가입성공 되었습니다.";
+			result= (!dao.insertMember(bean).equals("1"))?"회원가입이 실패하였습니다.":"회원가입성공 되었습니다.";
 			System.out.println("service impl:"+result);
 		
 		return result;
 	}
 
 	@Override
-	public int countMembers() {
+	public String countMembers() {
 		return new MemberDAOImpl().countMembers(); // memberList.length;
 	}
 

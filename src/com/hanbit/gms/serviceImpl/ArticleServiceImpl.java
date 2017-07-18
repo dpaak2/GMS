@@ -21,7 +21,7 @@ public class ArticleServiceImpl implements ArticleService {
 	public String addArticle(ArticleBean bean) {
 		String addResult="";
 		
-		if(dao.insertArticle(bean)==1){
+		if(dao.insertArticle(bean).equals("1")){
 			addResult="등록이 완료 되었습니다.";
 		}else{
 			addResult="등록이 실패되었습니다.";
@@ -31,7 +31,7 @@ public class ArticleServiceImpl implements ArticleService {
 	}
 	
 	@Override
-	public int countArticles() {
+	public String countArticles() {
 		
 		return dao.countArticles();
 	}
@@ -53,12 +53,7 @@ public class ArticleServiceImpl implements ArticleService {
 	@Override
 	public String updateArticle(ArticleBean update) {
 		String updateArticle="";
-		
-		if(dao.updateArticle(update)==1){
-			updateArticle="update success";
-		}else{
-			updateArticle="update fail";
-		}
+		updateArticle=(dao.updateArticle(update).equals("1"))?"update success":"update fail";
 		return updateArticle;
 	}
 
@@ -66,7 +61,7 @@ public class ArticleServiceImpl implements ArticleService {
 	public String deleteArticle(int seq) {
 		String deleteArticle="";
 	
-		if(dao.deleteArticle(seq)==1){
+		if(dao.deleteArticle(seq).equals("1")){
 			deleteArticle="성공적으로 삭제되었습니다.";
 		}else{
 			deleteArticle="delete failed";

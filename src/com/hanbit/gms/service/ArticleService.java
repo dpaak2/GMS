@@ -4,7 +4,7 @@ import com.hanbit.gms.domain.ArticleBean;
 
 public interface ArticleService {
 	public String addArticle(ArticleBean bean);
-	public int countArticles();
+	public String countArticles();
 	public List<ArticleBean> listArticles(); 
 	public ArticleBean findBySeq(int seqNo);
 	public List<ArticleBean> findById(String id); 

@@ -1,22 +1,23 @@
 package com.hanbit.gms.DAOImpl;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.hanbit.gms.DAO.ArticleDAO;
 import com.hanbit.gms.constant.DB;
+import com.hanbit.gms.constant.SQL;
+import com.hanbit.gms.constant.Vendor;
 import com.hanbit.gms.domain.ArticleBean;
+import com.hanbit.gms.factory.DatabaseFactory;
 
 public class ArticleDAOImpl implements ArticleDAO{
 	public static ArticleDAO instance= new ArticleDAOImpl();
 	public static ArticleDAO getInstance(){
 		try {
-			Class.forName(DB.DRIVER);
+			Class.forName(DB.ORACLE_DRIVER);
 		} catch (Exception e) {
 			System.out.println("SYSTEM FAILED ");
 			e.printStackTrace();
@@ -26,15 +27,14 @@ public class ArticleDAOImpl implements ArticleDAO{
 	private ArticleDAOImpl(){}
 
 	@Override
-	public int insertArticle(ArticleBean bean) {
-		int insertArticle=0;
+	public String insertArticle(ArticleBean bean) {
+		String insertArticle="";
 		try {
-			Connection connection=DriverManager.getConnection(DB.URL,DB.ID,DB.PW);
-			Statement stmt=connection.createStatement();
-			String sql="INSERT INTO Board (article_seq,id,title,content,hitcount,regdate)"
-					+ " VALUES (article_seq.nextval,'"+bean.getId()+"','"+bean.getTitle()+"','"+bean.getContent()+"',0,SYSDATE)";
-			System.out.println("INSERT SQL: "+sql);
-			insertArticle=stmt.executeUpdate(sql);
+			PreparedStatement pstmt=DatabaseFactory.createDatabase(Vendor.ORACLE, DB.ID, DB.PW).getConnection().prepareStatement(SQL.ARTICLE_INSERT);
+			pstmt.setString(1,bean.getId());
+			pstmt.setString(2, bean.getTitle());
+			pstmt.setString(3, bean.getContent());
+			insertArticle=String.valueOf(pstmt.executeUpdate());
 					
 		} catch (SQLException e) {
 			System.out.println("====insertArticle Fail");
@@ -44,15 +44,12 @@ public class ArticleDAOImpl implements ArticleDAO{
 	}
 
 	@Override
-	public int countArticles() {
-		int countArticles=0;
+	public String countArticles() {
+		String countArticles="";
 		try {
-			Connection connection=DriverManager.getConnection(DB.URL,DB.ID,DB.PW);
-			Statement stmt=connection.createStatement();
-			String sql="SELECT COUNT(*) as article_count FROM Board";
-			ResultSet rs= stmt.executeQuery(sql);
+			ResultSet rs= DatabaseFactory.createDatabase(Vendor.ORACLE,DB.ID, DB.PW).getConnection().prepareStatement(SQL.ARTICLE_COUT).executeQuery();
 			if(rs.next()){
-				countArticles=rs.getInt("article_count");
+				countArticles=rs.getString("article_count");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -66,10 +63,7 @@ public class ArticleDAOImpl implements ArticleDAO{
 		List<ArticleBean> listArticles=new ArrayList<>();
 		ArticleBean listBean=null;
 		try {
-			Connection connection=DriverManager.getConnection(DB.URL,DB.ID,DB.PW);
-			Statement stmt=connection.createStatement();
-			String sql="SELECT * FROM Board";
-			ResultSet rs=stmt.executeQuery(sql);
+			ResultSet rs=DatabaseFactory.createDatabase(Vendor.ORACLE,DB.ID,DB.PW).getConnection().prepareStatement(SQL.ARTICLE_LIST).executeQuery();
 			while (rs.next()) {
 				listBean=new ArticleBean();
 				listBean.setArticleSeq(rs.getInt("article_seq"));
@@ -91,12 +85,11 @@ public class ArticleDAOImpl implements ArticleDAO{
 	@Override
 	public ArticleBean selectBySeq(int seqNo) {
 		ArticleBean bean=new ArticleBean();
-		Connection connection;
 		try {
-			connection = DriverManager.getConnection(DB.URL,DB.ID,DB.PW);
-			Statement stmt= connection.createStatement();
 			String sql="SELECT * FROM Board WHERE article_seq='"+seqNo+"'";
-			ResultSet rs=stmt.executeQuery(sql);
+			PreparedStatement pstmt= DatabaseFactory.createDatabase(Vendor.ORACLE, DB.ID, DB.PW).getConnection().prepareStatement(SQL.ARTICLE_SELECTBYSEQ);
+			pstmt.setInt(1, seqNo);
+			ResultSet rs=pstmt.executeQuery();
 			if(rs.next()){
 				bean.setArticleSeq(Integer.parseInt(rs.getString("article_seq")));
 				bean.setId(rs.getString("id"));
@@ -117,11 +110,9 @@ public class ArticleDAOImpl implements ArticleDAO{
 		List<ArticleBean> list= new ArrayList<>();
 		ArticleBean temp= null;
 		try {
-			Connection connection= DriverManager.getConnection(DB.URL,DB.ID,DB.PW);
-			Statement stmt=connection.createStatement();
-			String sql="SELECT * FROM Board WHERE id LIKE '%"+id+"%'";
-			System.out.println("selectBYID SQL::::"+sql);
-			ResultSet rs= stmt.executeQuery(sql);
+			PreparedStatement pstmt=DatabaseFactory.createDatabase(Vendor.ORACLE,DB.ID, DB.PW).getConnection().prepareStatement(SQL.ARTICLE_SELECTBYID);
+			pstmt.setString(1, id);
+			ResultSet rs= pstmt.executeQuery();
 			while (rs.next()) {
 				temp=new ArticleBean();
 				temp.setArticleSeq(rs.getInt("article_seq"));
@@ -141,17 +132,23 @@ public class ArticleDAOImpl implements ArticleDAO{
 	}
 
 	@Override
-	public int updateArticle(ArticleBean update) {
-		int updateArticle=0;
+	public String updateArticle(ArticleBean update) {
+		ArticleBean temp=selectBySeq(update.getArticleSeq());
+		String updateArticle="";
+		String title=(update.getTitle().equals(""))?temp.getTitle():update.getTitle();
+		String content=(update.getContent().equals(""))?temp.getContent():update.getContent();
+		/*if(update.getTitle().equals("")){
+			update.setTitle(selectBySeq(update.getArticleSeq()).getTitle());
+		}
+		if(update.getContent().equals("")){
+			update.setContent(selectBySeq(update.getArticleSeq()).getContent());
+		}*/
 		try {
-			Connection connection= DriverManager.getConnection(DB.URL,DB.ID,DB.PW);
-			Statement stmt=connection.createStatement();
-			int updateSeqNo=update.getArticleSeq();
-			String updateTitle=update.getTitle();
-			String updateContent=update.getContent();
-			//UPDATE Board SET title='강아지',content='우리집 강아지는 복슬강아지' WHERE article_seq='1014';
-			String sql="UPDATE Board SET title='"+updateTitle+"',content='"+updateContent+"' WHERE article_seq='"+updateSeqNo+"'";
-			updateArticle=stmt.executeUpdate(sql);
+			PreparedStatement pstmt=DatabaseFactory.createDatabase(Vendor.ORACLE, DB.ID, DB.PW).getConnection().prepareStatement(SQL.ARTICLE_UPDATE);
+			pstmt.setString(1,title);
+			pstmt.setString(2,content);
+			pstmt.setInt(3, update.getArticleSeq());
+			updateArticle=String.valueOf(pstmt.executeUpdate());
 		} catch (Exception e) {
 			System.out.println("====updateArticle DAo failed===");
 			e.printStackTrace();
@@ -161,14 +158,13 @@ public class ArticleDAOImpl implements ArticleDAO{
 	}
 
 	@Override
-	public int deleteArticle(int seq) {
-		int deleteArticle=0;
+	public String deleteArticle(int seq) {
+		String deleteArticle="";
 		try {
-			Connection connection=DriverManager.getConnection(DB.URL,DB.ID,DB.PW);
-			Statement stmt=connection.createStatement();
+			PreparedStatement pstmt=DatabaseFactory.createDatabase(Vendor.ORACLE,DB.ID,DB.PW).getConnection().prepareStatement(SQL.ARTICLE_DELETE);
+			pstmt.setInt(1, seq);
 			//DELETE FROM table [WHERE conditions];
-			String sql="DELETE FROM Board WHERE article_seq='"+seq+"'";
-			deleteArticle =stmt.executeUpdate(sql);
+			deleteArticle =String.valueOf(pstmt.executeUpdate());
 		} catch (Exception e) {
 			System.out.println("DELETE DAOI ERROR");
 			e.printStackTrace();

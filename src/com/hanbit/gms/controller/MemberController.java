@@ -59,11 +59,8 @@ public class MemberController {
 			case UPDATE:
 				bean = new MemberBean();
 				bean.setId(JOptionPane.showInputDialog("로그인 아이디를 입력하여 주세요"));
-				bean.setName(JOptionPane.showInputDialog("변경하실 이름을 입력하여 주세요"));
 				bean.setPw(JOptionPane.showInputDialog("변경하실 비번을 입력하여 주세요"));
-				bean.setSsn(JOptionPane.showInputDialog("변경하실 주민번호를 입력하여 주세요"));
-				MemberServiceImpl.getInstance().modifiyProfile(bean);
-				JOptionPane.showMessageDialog(null, "프로필이 수정되었습니다.");
+				JOptionPane.showMessageDialog(null, MemberServiceImpl.getInstance().modifiyProfile(bean));
 				break flag;
 			case DEL:
 				MemberServiceImpl.getInstance().removeUser(JOptionPane.showInputDialog("삭제하려는 아이디 를 입력하세요"));

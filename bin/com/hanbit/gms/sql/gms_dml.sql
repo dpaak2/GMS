@@ -47,10 +47,11 @@ SELECT COUNT(*) as article_count FROM Board;
  UPDATE table SET column1 = expression1,
     column2 = expression2, column_n = expression_n
 [WHERE conditions];
+
 SELECT * FROM Board WHERE article_seq='1014';
 UPDATE Board SET title='강아지',content='우리집 강아지는 복슬강아지' WHERE article_seq='1014';
-
-
+UPDATE Member SET password='2' WHERE id='jinjin';
+DELETE FROM Board WHERE article_seq='1014';
 
 
 
