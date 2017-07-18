@@ -12,14 +12,21 @@ import com.hanbit.gms.constant.DB;
 import com.hanbit.gms.domain.MemberBean;
 
 public class MemberDAOImpl implements MemberDAO {
-	public MemberDAOImpl(){
+	public static MemberDAO instance= new MemberDAOImpl();
+	public static MemberDAO getInstance() {
 		try {
 			Class.forName(DB.DRIVER);
 		} catch (Exception e) {
-			System.out.println("====== DAO IMPL ::: LOAD FAIL");
+			System.out.println("SYSTEM FAILED ");
 			e.printStackTrace();
 		}
+		return instance;
 	}
+	public MemberDAOImpl(){}
+	
+	
+	
+	
 	@Override
 	public int insertMember(MemberBean bean) {
 		int insertMember=0;

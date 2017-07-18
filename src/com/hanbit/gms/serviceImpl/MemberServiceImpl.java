@@ -1,7 +1,6 @@
 package com.hanbit.gms.serviceImpl;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+
 import java.util.List;
 import java.util.Map;
 
@@ -16,24 +15,23 @@ public class MemberServiceImpl implements MemberService {
 	Map<String, MemberBean> map; // key 값은 String으로 주고 object(instance) =
 									// MemberBean이다
 	List<MemberBean> list;
-
-	public MemberServiceImpl() {
-		member = new MemberBean();
-		map = new HashMap<>(); // key값들은 hashCode이다
-		// 방 개수를 만들어주고
-		list = new ArrayList<>();
+	
+	
+	private MemberDAO dao=MemberDAOImpl.getInstance();
+	
+	public static MemberServiceImpl getInstance() {
+		return new MemberServiceImpl();
 	}
+
+	private MemberServiceImpl(){}
 
 	@Override
 	public String addMember(MemberBean bean) {
 		String result="";
-		if(bean.getId().equals("")){
-			result="회원가입이 실패하였습니다";
-		}else{
-			
+		
 			MemberDAO dao=new MemberDAOImpl();
-			result= (dao.insertMember(bean)==1)?"회원가입성공 되었습니다.":"회원가입이 실패하였습니다.";
-			System.out.println("service impl:"+result);}
+			result= (dao.insertMember(bean)!=1)?"회원가입이 실패하였습니다.":"회원가입성공 되었습니다.";
+			System.out.println("service impl:"+result);
 		
 		return result;
 	}
@@ -45,14 +43,12 @@ public class MemberServiceImpl implements MemberService {
 
 	@Override
 	public List<MemberBean> getMembers() {
-		MemberDAO dao=new MemberDAOImpl();
 		list=dao.selectAll();
 		return list; // ArrayList가 된다
 	}
 
 	@Override
 	public MemberBean findById(String id) {
-		MemberDAO dao = new MemberDAOImpl();
 		MemberBean member = new MemberBean();
 		member = dao.selectById(id);
 		return member;
@@ -60,7 +56,6 @@ public class MemberServiceImpl implements MemberService {
 
 	@Override
 	public List<MemberBean> findByName(String name) {
-		MemberDAO dao=new MemberDAOImpl();
 		return dao.selectByName(name);
 	}
 

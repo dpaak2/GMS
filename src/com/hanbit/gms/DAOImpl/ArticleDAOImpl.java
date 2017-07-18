@@ -13,15 +13,17 @@ import com.hanbit.gms.constant.DB;
 import com.hanbit.gms.domain.ArticleBean;
 
 public class ArticleDAOImpl implements ArticleDAO{
-	
-	public ArticleDAOImpl(){
+	public static ArticleDAO instance= new ArticleDAOImpl();
+	public static ArticleDAO getInstance(){
 		try {
 			Class.forName(DB.DRIVER);
 		} catch (Exception e) {
-			System.out.println("=====ARTICLE DAOIMPL::::LOAD FAILED");
+			System.out.println("SYSTEM FAILED ");
 			e.printStackTrace();
 		}
+		return instance;
 	}
+	private ArticleDAOImpl(){}
 
 	@Override
 	public int insertArticle(ArticleBean bean) {
